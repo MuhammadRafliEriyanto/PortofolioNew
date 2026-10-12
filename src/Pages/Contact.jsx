@@ -50,8 +50,8 @@ const ContactPage = () => {
     });
 
     try {
-      // Endpoint AJAX FormSubmit untuk pengiriman langsung ke inbox Gmail
-      const formSubmitUrl = "https://formsubmit.co/ajax/mhmmdrafli810@gmail.com";
+      // Endpoint AJAX FormSubmit untuk pengiriman langsung ke inbox raflieriyanto810@gmail.com
+      const formSubmitUrl = "https://formsubmit.co/ajax/raflieriyanto810@gmail.com";
 
       await axios.post(
         formSubmitUrl,
@@ -59,7 +59,8 @@ const ContactPage = () => {
           name: formData.name,
           email: formData.email,
           message: formData.message,
-          _subject: `Pesan Baru dari Portfolio: ${formData.name}`,
+          _subject: `Pesan Baru Portofolio dari: ${formData.name}`,
+          _replyto: formData.email,
           _template: "table",
           _captcha: "false",
         },
@@ -150,8 +151,8 @@ const ContactPage = () => {
                   Hubungi
                 </h2>
                 <p className="text-slate-400/80">
-                  Ada yang ingin didiskusikan? Kirim saya pesan dan mari kita
-                  bicara.
+                  Ada yang ingin didiskusikan? Kirim pesan langsung ke{" "}
+                  <span className="text-[#00ff88] font-medium">raflieriyanto810@gmail.com</span> melalui form di bawah ini.
                 </p>
               </div>
               <Share2 className="w-10 h-10 text-primary opacity-50" />
