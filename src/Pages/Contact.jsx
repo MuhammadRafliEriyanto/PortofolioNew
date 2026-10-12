@@ -37,38 +37,51 @@ const ContactPage = () => {
 
     Swal.fire({
       title: "Mengirim Pesan...",
-      html: "Harap tunggu selagi kami mengirim pesan Anda",
+      html: "Harap tunggu selagi pesan Anda dikirim ke email",
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
       },
+      background: "#0b0f19",
+      color: "#ffffff",
+      customClass: {
+        popup: "border border-white/10 rounded-2xl backdrop-blur-xl",
+      },
     });
 
     try {
-      // Ganti dengan email Anda di FormSubmit
-      const formSubmitUrl = "https://formsubmit.co/mhmmdrafli810@gmail.com";
+      // Endpoint AJAX FormSubmit untuk pengiriman langsung ke inbox Gmail
+      const formSubmitUrl = "https://formsubmit.co/ajax/mhmmdrafli810@gmail.com";
 
-      // Siapkan data form untuk FormSubmit
-      const submitData = new FormData();
-      submitData.append("name", formData.name);
-      submitData.append("email", formData.email);
-      submitData.append("message", formData.message);
-      submitData.append("_subject", "Pesan Baru dari Website Portfolio");
-      submitData.append("_captcha", "false"); // Nonaktifkan captcha
-      submitData.append("_template", "table"); // Format email sebagai tabel
-
-      await axios.post(formSubmitUrl, submitData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
+      await axios.post(
+        formSubmitUrl,
+        {
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          _subject: `Pesan Baru dari Portfolio: ${formData.name}`,
+          _template: "table",
+          _captcha: "false",
         },
-      });
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
 
       Swal.fire({
-        title: "Berhasil!",
-        text: "Pesan Anda telah berhasil terkirim!",
+        title: "Pesan Terkirim!",
+        text: "Terima kasih! Pesan Anda telah berhasil dikirim ke email saya.",
         icon: "success",
         confirmButtonColor: "#00ff88",
-        timer: 2000,
+        background: "#0b0f19",
+        color: "#ffffff",
+        customClass: {
+          popup: "border border-white/10 rounded-2xl backdrop-blur-xl",
+        },
+        timer: 3000,
         timerProgressBar: true,
       });
 
@@ -78,29 +91,18 @@ const ContactPage = () => {
         message: "",
       });
     } catch (error) {
-      if (error.request && error.request.status === 0) {
-        Swal.fire({
-          title: "Berhasil!",
-          text: "Pesan Anda telah berhasil terkirim!",
-          icon: "success",
-          confirmButtonColor: "#00ff88",
-          timer: 2000,
-          timerProgressBar: true,
-        });
-
-        setFormData({
-          name: "",
-          email: "",
-          message: "",
-        });
-      } else {
-        Swal.fire({
-          title: "Gagal!",
-          text: "Terjadi kesalahan. Silakan coba lagi nanti.",
-          icon: "error",
-          confirmButtonColor: "#00ff88",
-        });
-      }
+      console.error("Error sending message:", error);
+      Swal.fire({
+        title: "Gagal Mengirim",
+        text: "Terjadi kesalahan saat mengirim pesan. Silakan coba lagi atau hubungi via LinkedIn.",
+        icon: "error",
+        confirmButtonColor: "#00ff88",
+        background: "#0b0f19",
+        color: "#ffffff",
+        customClass: {
+          popup: "border border-white/10 rounded-2xl backdrop-blur-xl",
+        },
+      });
     } finally {
       setIsSubmitting(false);
     }

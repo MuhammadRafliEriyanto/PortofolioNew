@@ -15,104 +15,83 @@ import {
   Package,
   Cpu,
   Code,
+  Sparkles,
+  Server,
+  Database,
+  Lock,
+  Terminal,
+  ShieldCheck,
+  CheckCircle2,
 } from "lucide-react";
 import Swal from "sweetalert2";
+import { motion } from "framer-motion";
 import { toSlug } from "../utils/slug";
+import { supabase } from "../supabase";
 
 const TECH_ICONS = {
   React: Globe,
   Tailwind: Layout,
+  "Tailwind CSS": Layout,
   Express: Cpu,
+  "Express.js": Cpu,
   Python: Code,
   Javascript: Code,
-  HTML: Code,
-  CSS: Code,
+  HTML: Layout,
+  CSS: Layout,
+  Node: Server,
+  "Node.js": Server,
+  MongoDB: Database,
+  MySQL: Database,
+  PHP: Code,
+  Laravel: Layers,
+  Bootstrap: Layout,
   default: Package,
+};
+
+const parseList = (val) => {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  if (typeof val === "string") {
+    try {
+      const parsed = JSON.parse(val);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      return val
+        .split(/\r?\n|,/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
+  }
+  return [];
 };
 
 const TechBadge = ({ tech }) => {
   const Icon = TECH_ICONS[tech] || TECH_ICONS["default"];
   return (
-    <div className="group relative overflow-hidden px-3 py-2 md:px-4 md:py-2.5 bg-gradient-to-r from-primary/10 to-accent/10 rounded-xl border border-primary/10 hover:border-primary/30 transition-all duration-300 cursor-default">
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/0 to-accent/0 group-hover:from-primary/10 group-hover:to-accent/10 transition-all duration-500" />
-      <div className="relative flex items-center gap-1.5 md:gap-2">
-        <Icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary/80 group-hover:text-primary transition-colors" />
-        <span className="text-xs md:text-sm font-medium text-primary/70 group-hover:text-primary/80 transition-colors">
-          {tech}
-        </span>
+    <div className="group relative flex items-center gap-2 px-3 py-1.5 md:px-3.5 md:py-2 rounded-xl bg-white/[0.03] border border-white/10 hover:border-[#00ff88]/40 hover:bg-[#00ff88]/5 transition-all duration-300">
+      <div className="p-1 rounded-md bg-white/5 text-[#00ff88] group-hover:scale-110 transition-transform">
+        <Icon className="w-3.5 h-3.5" />
       </div>
-    </div>
-  );
-};
-
-const FeatureItem = ({ feature }) => {
-  return (
-    <li className="group flex items-start space-x-3 p-2.5 md:p-3.5 rounded-xl hover:bg-white/5 transition-all duration-300 border border-transparent hover:border-white/10">
-      <div className="relative mt-2">
-        <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur group-hover:opacity-100 opacity-0 transition-opacity duration-300" />
-        <div className="relative w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-gradient-to-r from-primary to-accent group-hover:scale-125 transition-transform duration-300" />
-      </div>
-      <span className="text-sm md:text-base text-slate-300/80 group-hover:text-white transition-colors">
-        {feature}
+      <span className="text-xs md:text-sm font-medium text-slate-300 group-hover:text-white transition-colors">
+        {tech}
       </span>
-    </li>
-  );
-};
-
-const ProjectStats = ({ project }) => {
-  const techStackCount = project?.TechStack?.length || 0;
-  const featuresCount = project?.Features?.length || 0;
-
-  return (
-    <div className="grid grid-cols-2 gap-3 md:gap-4 p-3 md:p-4 bg-[#0a0a1a] rounded-xl overflow-hidden relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 opacity-50 blur-2xl z-0" />
-      <div className="relative z-10 flex items-center space-x-2 md:space-x-3 bg-white/5 p-2 md:p-3 rounded-lg border border-primary/20 transition-all duration-300 hover:scale-105 hover:border-primary/50 hover:shadow-lg">
-        <div className="bg-primary/20 p-1.5 md:p-2 rounded-full">
-          <Code2
-            className="text-primary/80 w-4 h-4 md:w-6 md:h-6"
-            strokeWidth={1.5}
-          />
-        </div>
-        <div className="flex-grow">
-          <div className="text-lg md:text-xl font-semibold text-primary/90">
-            {techStackCount}
-          </div>
-          <div className="text-[10px] md:text-xs text-slate-400/80">
-            Total Teknologi
-          </div>
-        </div>
-      </div>
-
-      <div className="relative z-10 flex items-center space-x-2 md:space-x-3 bg-white/5 p-2 md:p-3 rounded-lg border border-accent/20 transition-all duration-300 hover:scale-105 hover:border-accent/50 hover:shadow-lg">
-        <div className="bg-accent/20 p-1.5 md:p-2 rounded-full">
-          <Layers
-            className="text-accent/90 w-4 h-4 md:w-6 md:h-6"
-            strokeWidth={1.5}
-          />
-        </div>
-        <div className="flex-grow">
-          <div className="text-lg md:text-xl font-semibold text-accent/90">
-            {featuresCount}
-          </div>
-          <div className="text-[10px] md:text-xs text-slate-400/80">
-            Fitur Utama
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
 
 const handleGithubClick = (githubLink) => {
-  if (githubLink === "Private") {
+  if (githubLink === "Private" || !githubLink) {
     Swal.fire({
       icon: "info",
       title: "Source Code Private",
-      text: "Maaf, source code untuk proyek ini bersifat privat.",
+      text: "Maaf, repository source code untuk proyek ini bersifat privat.",
       confirmButtonText: "Mengerti",
       confirmButtonColor: "#00ff88",
       background: "#0b0f19",
       color: "#ffffff",
+      customClass: {
+        popup: "border border-white/10 rounded-2xl backdrop-blur-xl",
+      },
     });
     return false;
   }
@@ -123,279 +102,400 @@ const ProjectDetails = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
-  // kept state-free for image rendering; lint-safe
+  const [imgError, setImgError] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const storedProjects = JSON.parse(localStorage.getItem("projects")) || [];
-    // Cari project berdasarkan slug yang di-generate dari Title
-    const selectedProject = storedProjects.find(
-      (p) => toSlug(p.Title) === slug,
-    );
 
-    if (selectedProject) {
-      const enhancedProject = {
-        ...selectedProject,
-        Features: selectedProject.Features || [],
-        TechStack: selectedProject.TechStack || [],
-        Github:
-          selectedProject.Github || "https://github.com/MuhammadRafliEriyanto",
-      };
-      setProject(enhancedProject);
-    }
+    const getProjectFallbackImg = (title) => {
+      const t = (title || "").toLowerCase();
+      if (t.includes("eyehealth")) return "/eyehealth_banner.jpg?v=2";
+      if (t.includes("hiitify")) return "/hiitify_banner.jpg?v=2";
+      if (t.includes("chipset")) return "/spk_chipset_banner.jpg?v=2";
+      if (t.includes("bimbel")) return "/smart_bimbel_banner.jpg?v=2";
+      return "";
+    };
+
+    const getProjectFallbackLink = (title) => {
+      const t = (title || "").toLowerCase();
+      if (t.includes("bimbel")) return "https://binacendikia.web.id";
+      return "";
+    };
+
+    const loadProject = async () => {
+      // 1. Coba cari di localStorage lebih dulu
+      const storedProjects = JSON.parse(localStorage.getItem("projects")) || [];
+      const found = storedProjects.find((p) => toSlug(p.Title || p.title) === slug);
+
+      if (found) {
+        const title = found.Title || found.title;
+        const fallback = getProjectFallbackImg(title);
+        setProject({
+          ...found,
+          Title: title,
+          Description: found.Description || found.description,
+          Img: (found.Img && found.Img.startsWith("http")) ? found.Img : (fallback || found.Img || found.img),
+          Link: found.Link || found.link || getProjectFallbackLink(title),
+          Github: found.Github || found.github || "https://github.com/MuhammadRafliEriyanto",
+          Features: parseList(found.Features || found.features),
+          TechStack: parseList(found.TechStack || found.techstack || found.tech_stack),
+        });
+        setLoading(false);
+        return;
+      }
+
+      // 2. Fallback fetch langsung dari Supabase jika belum ada di localStorage
+      try {
+        const { data, error } = await supabase.from("projects").select("*");
+        if (data && !error) {
+          const match = data.find((p) => toSlug(p.Title || p.title) === slug);
+          if (match) {
+            const title = match.Title || match.title;
+            setProject({
+              ...match,
+              Title: title,
+              Description: match.Description || match.description,
+              Img: match.Img || match.img || getProjectFallbackImg(title),
+              Link: match.Link || match.link || getProjectFallbackLink(title),
+              Github: match.Github || match.github || "https://github.com/MuhammadRafliEriyanto",
+              Features: parseList(match.Features || match.features),
+              TechStack: parseList(match.TechStack || match.techstack || match.tech_stack),
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching project fallback:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProject();
   }, [slug]);
 
-  if (!project) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-[#0b0f19] flex items-center justify-center">
-        <div className="text-center space-y-6 animate-fadeIn">
-          <div className="w-16 h-16 md:w-24 md:h-24 mx-auto border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-          <h2 className="text-xl md:text-3xl font-bold text-white">
-            Loading Project...
-          </h2>
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 border-3 border-[#00ff88]/20 border-t-[#00ff88] rounded-full animate-spin" />
+          <p className="text-sm font-medium text-slate-400">Loading project details...</p>
         </div>
       </div>
     );
   }
 
+  if (!project) {
+    return (
+      <div className="min-h-screen bg-[#0b0f19] flex flex-col items-center justify-center px-4 text-center">
+        <div className="p-4 rounded-full bg-white/5 border border-white/10 mb-4 text-[#00ff88]">
+          <Terminal className="w-8 h-8" />
+        </div>
+        <h2 className="text-2xl font-bold text-white mb-2">Project Tidak Ditemukan</h2>
+        <p className="text-sm text-slate-400 max-w-md mb-6">
+          Proyek yang Anda cari mungkin telah diperbarui atau alamat tautan tidak valid.
+        </p>
+        <button
+          onClick={() => navigate("/#Portofolio")}
+          className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-[#00ff88]/10 border border-white/10 hover:border-[#00ff88]/40 text-white text-sm font-medium transition-all"
+        >
+          Kembali ke Portfolio
+        </button>
+      </div>
+    );
+  }
+
   const projectUrl = `https://your-domain.com/project/${toSlug(project.Title)}`;
+  const features = project.Features || [];
+  const techStack = project.TechStack || [];
 
   return (
     <>
       <Helmet>
         <title>{project.Title} — Muhammad Rafli Eriyanto</title>
-
         <meta
           name="description"
           content={
             project.Description
               ? project.Description.slice(0, 155)
-              : `Project ${project.Title} oleh Muhammad Rafli Eriyanto — Backend Developer.`
+              : `Project ${project.Title} oleh Muhammad Rafli Eriyanto.`
           }
         />
-
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href={projectUrl} />
-
-        <meta
-          property="og:title"
-          content={`${project.Title} — Muhammad Rafli Eriyanto`}
-        />
-        <meta
-          property="og:description"
-          content={project.Description?.slice(0, 155)}
-        />
+        <meta property="og:title" content={`${project.Title} — Muhammad Rafli Eriyanto`} />
+        <meta property="og:description" content={project.Description?.slice(0, 155)} />
         <meta property="og:url" content={projectUrl} />
         <meta property="og:type" content="website" />
-
         {project.Img && <meta property="og:image" content={project.Img} />}
-
-        <script type="application/ld+json">{`
-        {
-          "@context": "https://schema.org",
-          "@type": "CreativeWork",
-          "name": "${project.Title}",
-          "description": "${project.Description?.replace(/"/g, '\\"')}",
-          "url": "${projectUrl}",
-          "author": {
-            "@type": "Person",
-            "name": "Muhammad Rafli Eriyanto",
-            "alternateName": "Dolph1nsss",
-            "url": "https://your-domain.com"
-          }
-        }
-      `}</script>
       </Helmet>
 
-      <div className="min-h-screen bg-[#0b0f19] px-[2%] sm:px-0 relative overflow-hidden">
-        <div className="fixed inset-0">
-          <div className="absolute -inset-[10px] opacity-20">
-            <div className="absolute top-0 -left-4 w-72 md:w-96 h-72 md:h-96 bg-primary rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob" />
-            <div className="absolute top-0 -right-4 w-72 md:w-96 h-72 md:h-96 bg-accent rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000" />
-            <div className="absolute -bottom-8 left-20 w-72 md:w-96 h-72 md:h-96 bg-primary rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000" />
-          </div>
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02]" />
+      <div className="min-h-screen bg-[#0b0f19] text-white relative overflow-hidden">
+        {/* Subtle Ambient Background Gradients */}
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <div className="absolute top-10 left-1/4 w-[500px] h-[500px] bg-[#00ff88]/5 rounded-full blur-[140px]" />
+          <div className="absolute top-1/3 right-10 w-[450px] h-[450px] bg-[#1e3a8a]/10 rounded-full blur-[140px]" />
         </div>
 
-        <div className="relative">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-16">
-            <div className="flex items-center space-x-2 md:space-x-4 mb-8 md:mb-12 animate-fadeIn">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+          {/* Top Bar Navigation */}
+          <motion.div
+            initial={{ opacity: 0, y: -15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="flex flex-wrap items-center justify-between gap-4 pb-6 md:pb-8 border-b border-white/5"
+          >
+            <div className="flex items-center space-x-3">
               <button
                 onClick={() => navigate(-1)}
-                className="group inline-flex items-center space-x-1.5 md:space-x-2 px-3 md:px-5 py-2 md:py-2.5 bg-white/5 backdrop-blur-xl rounded-xl text-white/90 hover:bg-white/10 transition-all duration-300 border border-white/10 hover:border-white/20 text-sm md:text-base"
+                className="group flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/5 hover:bg-[#00ff88]/10 border border-white/10 hover:border-[#00ff88]/40 text-slate-300 hover:text-white transition-all text-xs md:text-sm font-medium"
               >
-                <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 group-hover:-translate-x-1 transition-transform" />
+                <ArrowLeft className="w-3.5 h-3.5 md:w-4 md:h-4 group-hover:-translate-x-1 transition-transform" />
                 <span>Back</span>
               </button>
-              <div className="flex items-center space-x-1 md:space-x-2 text-sm md:text-base text-white/50">
-                <span>Projects</span>
-                <ChevronRight className="w-3 h-3 md:w-4 md:h-4" />
-                <span className="text-white/90 truncate">{project.Title}</span>
+
+              <div className="flex items-center space-x-2 text-xs md:text-sm text-slate-400">
+                <span className="hover:text-slate-200 cursor-pointer" onClick={() => navigate("/#Portofolio")}>
+                  Projects
+                </span>
+                <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
+                <span className="text-white font-medium truncate max-w-[200px] sm:max-w-none">
+                  {project.Title}
+                </span>
               </div>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-8 md:gap-16">
-              <div className="space-y-6 md:space-y-10 animate-slideInLeft">
-                <div className="space-y-4 md:space-y-6">
-                  <h1 className="text-3xl md:text-6xl font-bold bg-gradient-to-r from-primary/90 via-primary/60 to-accent/80 bg-clip-text text-transparent leading-tight">
-                    {project.Title}
-                  </h1>
-                  <div className="relative h-1 w-16 md:w-24">
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-full animate-pulse" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-full blur-sm" />
+            {/* Quick Action Buttons (Top Right) */}
+            <div className="flex items-center space-x-2.5">
+              {project.Link && (
+                <a
+                  href={project.Link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[#00ff88]/10 hover:bg-[#00ff88]/20 border border-[#00ff88]/30 hover:border-[#00ff88]/60 text-[#00ff88] text-xs md:text-sm font-medium transition-all"
+                >
+                  <span>Live Demo</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
+
+              {project.Github && (
+                <a
+                  href={project.Github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => !handleGithubClick(project.Github) && e.preventDefault()}
+                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-slate-300 hover:text-white text-xs md:text-sm font-medium transition-all"
+                >
+                  <Github className="w-3.5 h-3.5" />
+                  <span>GitHub</span>
+                </a>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Hero Header: Title, Description & Metadata */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="pt-8 pb-10"
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00ff88]/10 border border-[#00ff88]/20 text-[#00ff88] text-xs font-semibold mb-4">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Project Overview</span>
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-[#00ff88] bg-clip-text text-transparent leading-tight">
+              {project.Title}
+            </h1>
+
+            <p className="text-slate-300 text-sm sm:text-base md:text-lg leading-relaxed max-w-3xl mt-4 font-normal">
+              {project.Description}
+            </p>
+
+            {/* Compact Metadata Badges */}
+            <div className="flex flex-wrap items-center gap-3 mt-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/10 text-xs text-slate-300">
+                <Code2 className="w-3.5 h-3.5 text-[#00ff88]" />
+                <span>
+                  <strong className="text-white">{techStack.length}</strong> Total Teknologi
+                </span>
+              </div>
+
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/10 text-xs text-slate-300">
+                <Layers className="w-3.5 h-3.5 text-blue-400" />
+                <span>
+                  <strong className="text-white">{features.length}</strong> Fitur Utama
+                </span>
+              </div>
+
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/10 text-xs text-slate-300">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Verified Architecture</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Main Bento Grid: 2 Columns */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            {/* Left Column: Visual Preview & Tech Stack (lg:col-span-6) */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="lg:col-span-6 space-y-6"
+            >
+              {/* Preview Window (Browser Mockup Frame) */}
+              <div className="rounded-2xl overflow-hidden bg-[#0F1629] border border-white/10 shadow-xl transition-all duration-300 hover:border-[#00ff88]/30">
+                {/* Browser Title Bar */}
+                <div className="flex items-center justify-between px-4 py-2.5 bg-black/40 border-b border-white/5">
+                  <div className="flex items-center space-x-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#27c93f]" />
                   </div>
+                  <div className="flex items-center space-x-1.5 px-3 py-0.5 rounded-md bg-white/5 text-[11px] text-slate-400 font-mono">
+                    <Lock className="w-2.5 h-2.5 text-[#00ff88]" />
+                    <span>{project.Link ? project.Link.replace(/^https?:\/\//i, "").replace(/\/$/, "") : `${toSlug(project.Title)}.preview`}</span>
+                  </div>
+                  <div className="w-8" />
                 </div>
 
-                <div className="prose prose-invert max-w-none">
-                  <p className="text-base md:text-lg text-slate-300/80 leading-relaxed">
-                    {project.Description}
-                  </p>
-                </div>
+                {/* Window Body: Image or Fallback Mockup */}
+                <div className="relative aspect-[16/10] bg-[#0A0F1C] flex items-center justify-center overflow-hidden">
+                  {project.Img && !imgError ? (
+                    <img
+                      src={project.Img}
+                      alt={project.Title}
+                      onError={() => setImgError(true)}
+                      className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="relative w-full h-full p-6 flex flex-col justify-between items-center text-center bg-gradient-to-b from-[#0F1629]/80 to-[#0A0F1C]">
+                      <div className="absolute inset-0 bg-[radial-gradient(#00ff88_1px,transparent_1px)] [background-size:16px_16px] opacity-10" />
+                      
+                      <div className="w-full flex justify-between items-center text-xs text-slate-500 font-mono">
+                        <span>SYS.READY</span>
+                        <span className="flex items-center gap-1.5 text-[#00ff88]">
+                          <span className="w-2 h-2 rounded-full bg-[#00ff88] animate-ping" />
+                          ONLINE
+                        </span>
+                      </div>
 
-                <ProjectStats project={project} />
+                      <div className="flex flex-col items-center my-auto space-y-3 z-10">
+                        <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10 shadow-[0_0_30px_rgba(0,255,136,0.1)]">
+                          <Terminal className="w-8 h-8 text-[#00ff88]" />
+                        </div>
+                        <div>
+                          <h4 className="text-base font-semibold text-white tracking-wide">
+                            {project.Title}
+                          </h4>
+                          <p className="text-xs text-slate-400 mt-1">
+                            Interactive System Architecture
+                          </p>
+                        </div>
+                      </div>
 
-                <div className="flex flex-wrap gap-3 md:gap-4">
-                  <a
-                    href={project.Link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group relative inline-flex items-center space-x-1.5 md:space-x-2 px-4 md:px-8 py-2.5 md:py-4 bg-gradient-to-r from-primary/10 to-accent/10 hover:from-primary/20 hover:to-accent/20 text-primary/90 rounded-xl transition-all duration-300 border border-primary/20 hover:border-primary/40 backdrop-blur-xl overflow-hidden text-sm md:text-base"
-                  >
-                    <div className="absolute inset-0 translate-y-[100%] bg-gradient-to-r from-primary/10 to-accent/10 transition-transform duration-300 group-hover:translate-y-[0%]" />
-                    <ExternalLink className="relative w-4 h-4 md:w-5 md:h-5 group-hover:rotate-12 transition-transform" />
-                    <span className="relative font-medium">Live Demo</span>
-                  </a>
-
-                  <a
-                    href={project.Github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group relative inline-flex items-center space-x-1.5 md:space-x-2 px-4 md:px-8 py-2.5 md:py-4 bg-gradient-to-r from-accent/10 to-primary/10 hover:from-accent/20 hover:to-primary/20 text-primary/90 rounded-xl transition-all duration-300 border border-accent/20 hover:border-accent/40 backdrop-blur-xl overflow-hidden text-sm md:text-base"
-                    onClick={(e) =>
-                      !handleGithubClick(project.Github) && e.preventDefault()
-                    }
-                  >
-                    <div className="absolute inset-0 translate-y-[100%] bg-gradient-to-r from-accent/10 to-primary/10 transition-transform duration-300 group-hover:translate-y-[0%]" />
-                    <Github className="relative w-4 h-4 md:w-5 md:h-5 group-hover:rotate-12 transition-transform" />
-                    <span className="relative font-medium">Github</span>
-                  </a>
-                </div>
-
-                <div className="space-y-4 md:space-y-6">
-                  <h3 className="text-lg md:text-xl font-semibold text-white/90 mt-[3rem] md:mt-0 flex items-center gap-2 md:gap-3">
-                    <Code2 className="w-4 h-4 md:w-5 md:h-5 text-primary/80" />
-                    Technologies Used
-                  </h3>
-                  {project.TechStack.length > 0 ? (
-                    <div className="flex flex-wrap gap-2 md:gap-3">
-                      {project.TechStack.map((tech, index) => (
-                        <TechBadge key={index} tech={tech} />
-                      ))}
+                      <div className="w-full flex justify-center z-10">
+                        <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] text-slate-400 font-medium">
+                          Workspace Preview Mode
+                        </span>
+                      </div>
                     </div>
-                  ) : (
-                    <p className="text-sm md:text-base text-slate-400/80 opacity-50">
-                      No technologies added.
-                    </p>
                   )}
                 </div>
               </div>
 
-              <div className="space-y-6 md:space-y-10 animate-slideInRight">
-                <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl group">
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0b0f19] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <img
-                    src={project.Img}
-                    alt={project.Title}
-                    className="w-full object-cover transform transition-transform duration-700 will-change-transform group-hover:scale-105"
-                    // no-op: image load state was unused
-                  />
-                  <div className="absolute inset-0 border-2 border-white/0 group-hover:border-white/10 transition-colors duration-300 rounded-2xl" />
-                </div>
-
-                <div className="bg-white/[0.02] backdrop-blur-xl rounded-2xl p-8 border border-white/10 space-y-6 hover:border-white/20 transition-colors duration-300 group">
-                  <h3 className="text-xl font-semibold text-white/90 flex items-center gap-3">
-                    <Star className="w-5 h-5 text-yellow-400 group-hover:rotate-[20deg] transition-transform duration-300" />
-                    Key Features
+              {/* Technologies Used Section */}
+              <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm md:text-base font-semibold text-white flex items-center gap-2">
+                    <Code2 className="w-4 h-4 text-[#00ff88]" />
+                    <span>Technologies & Frameworks</span>
                   </h3>
-                  {project.Features.length > 0 ? (
-                    <ul className="list-none space-y-2">
-                      {project.Features.map((feature, index) => (
-                        <FeatureItem key={index} feature={feature} />
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-slate-400/80 opacity-50">
-                      No features added.
-                    </p>
-                  )}
+                  <span className="text-xs text-slate-500 font-mono">
+                    {techStack.length} tools
+                  </span>
                 </div>
+
+                {techStack.length > 0 ? (
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {techStack.map((tech, index) => (
+                      <TechBadge key={index} tech={tech} />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-500">Tidak ada data teknologi.</p>
+                )}
               </div>
-            </div>
+            </motion.div>
+
+            {/* Right Column: Key Features (lg:col-span-6) */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.25 }}
+              className="lg:col-span-6 space-y-4"
+            >
+              <div className="p-5 md:p-6 rounded-2xl bg-white/[0.02] border border-white/5 space-y-5">
+                <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                  <div className="flex items-center space-x-2.5">
+                    <div className="p-1.5 rounded-lg bg-amber-400/10 text-amber-400">
+                      <Star className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-white">
+                        Key Features & Capabilities
+                      </h3>
+                      <p className="text-xs text-slate-400">
+                        Fitur utama dan peran teknis dalam sistem
+                      </p>
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full bg-white/5 text-[11px] font-mono text-[#00ff88]">
+                    {features.length} Total
+                  </span>
+                </div>
+
+                {features.length > 0 ? (
+                  <div className="space-y-3">
+                    {features.map((feature, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.35, delay: 0.1 + index * 0.05 }}
+                        className="group relative p-3.5 md:p-4 rounded-xl bg-[#0F1629]/50 border border-white/5 hover:border-[#00ff88]/30 hover:bg-[#0F1629] transition-all duration-300 flex items-start gap-3.5 hover:-translate-y-0.5 shadow-sm"
+                      >
+                        {/* Number Badge */}
+                        <div className="flex-shrink-0 w-6 h-6 rounded-md bg-[#00ff88]/10 border border-[#00ff88]/20 flex items-center justify-center text-[#00ff88] text-[11px] font-mono font-bold group-hover:scale-105 group-hover:bg-[#00ff88]/20 transition-all mt-0.5">
+                          {String(index + 1).padStart(2, "0")}
+                        </div>
+
+                        {/* Feature Content */}
+                        <div className="flex-grow">
+                          <p className="text-xs sm:text-sm text-slate-300 group-hover:text-white leading-relaxed transition-colors">
+                            {feature}
+                          </p>
+                        </div>
+
+                        {/* Hover indicator icon */}
+                        <CheckCircle2 className="w-4 h-4 text-[#00ff88] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-0.5" />
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-500 py-4 text-center">
+                    Tidak ada fitur yang ditambahkan.
+                  </p>
+                )}
+              </div>
+            </motion.div>
+
           </div>
         </div>
-
-        <style>{`
-          @keyframes blob {
-            0% {
-              transform: translate(0px, 0px) scale(1);
-            }
-            33% {
-              transform: translate(30px, -50px) scale(1.1);
-            }
-            66% {
-              transform: translate(-20px, 20px) scale(0.9);
-            }
-            100% {
-              transform: translate(0px, 0px) scale(1);
-            }
-          }
-          .animate-blob {
-            animation: blob 10s infinite;
-          }
-          .animation-delay-2000 {
-            animation-delay: 2s;
-          }
-          .animation-delay-4000 {
-            animation-delay: 4s;
-          }
-          .animate-fadeIn {
-            animation: fadeIn 0.7s ease-out;
-          }
-          .animate-slideInLeft {
-            animation: slideInLeft 0.7s ease-out;
-          }
-          .animate-slideInRight {
-            animation: slideInRight 0.7s ease-out;
-          }
-          @keyframes fadeIn {
-            from {
-              opacity: 0;
-            }
-            to {
-              opacity: 1;
-            }
-          }
-          @keyframes slideInLeft {
-            from {
-              opacity: 0;
-              transform: translateX(-30px);
-            }
-            to {
-              opacity: 1;
-              transform: translateX(0);
-            }
-          }
-          @keyframes slideInRight {
-            from {
-              opacity: 0;
-              transform: translateX(30px);
-            }
-            to {
-              opacity: 1;
-              transform: translateX(0);
-            }
-          }
-        `}</style>
       </div>
     </>
   );

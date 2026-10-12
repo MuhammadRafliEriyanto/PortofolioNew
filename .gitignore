@@ -25,4 +25,11 @@ dist/
 *.njsproj
 *.sln
 *.sw?
+# Environment variables (Sangat Rahasia - Tidak akan pernah ter-upload ke Git)
+.env
+.env.*
 *.env
+
+# Database & Data scripts (Internal local files)
+*.sql
+*.csv

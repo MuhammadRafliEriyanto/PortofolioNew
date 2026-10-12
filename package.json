@@ -45,6 +45,7 @@
     "spline": "^0.0.0",
     "styled-components": "^6.1.13",
     "sweetalert2": "^11.15.0",
+    "swiper": "^14.3.0",
     "tailwind-merge": "^2.5.5",
     "typewriter-effect": "^2.21.0"
   },

@@ -108,6 +108,29 @@ body {
    animation: shine 1.5s ease-in-out infinite;
  }
 
+/* Marquee / Running Text Animations */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 25s linear infinite;
+  will-change: transform;
+}
+
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+}
+
+
   
 /*   @media (prefers-color-scheme: dark) {
 	::-webkit-scrollbar-track {

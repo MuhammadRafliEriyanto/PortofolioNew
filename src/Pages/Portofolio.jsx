@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 
 import { supabase } from "../supabase";
 
@@ -17,13 +17,20 @@ import TechStackIcon from "../components/TechStackIcon";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Certificate from "../components/Certificate";
-import { Code, Award, Boxes } from "lucide-react";
+import { Code, Award, Boxes, ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
+
+// Swiper
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/effect-coverflow";
+import { EffectCoverflow, Autoplay } from "swiper/modules";
 
 const ToggleButton = ({ onClick, isShowingMore }) => (
   <button
     onClick={onClick}
     className="
-      px-3 py-1.5
+      px-5 py-2.5
       text-slate-300 
       hover:text-white 
       text-sm 
@@ -33,14 +40,15 @@ const ToggleButton = ({ onClick, isShowingMore }) => (
       ease-in-out
       flex 
       items-center 
-      gap-2
+      gap-2.5
       bg-white/5 
-      hover:bg-white/10
-      rounded-md
+      hover:bg-primary/10
+      rounded-xl
       border 
       border-white/10
-      hover:border-white/20
-      backdrop-blur-sm
+      hover:border-primary/40
+      hover:shadow-[0_0_20px_rgba(0,255,136,0.2)]
+      backdrop-blur-md
       group
       relative
       overflow-hidden
@@ -59,7 +67,7 @@ const ToggleButton = ({ onClick, isShowingMore }) => (
         strokeLinecap="round"
         strokeLinejoin="round"
         className={`
-          transition-transform 
+          text-primary transition-transform 
           duration-300 
           ${isShowingMore ? "group-hover:-translate-y-0.5" : "group-hover:translate-y-0.5"}
         `}
@@ -69,7 +77,7 @@ const ToggleButton = ({ onClick, isShowingMore }) => (
         ></polyline>
       </svg>
     </span>
-    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary/50 transition-all duration-300 group-hover:w-full"></span>
+    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
   </button>
 );
 
@@ -137,6 +145,7 @@ const techStacks = [
 export default function FullWidthTabs() {
   const theme = useTheme();
   const [value, setValue] = useState(0);
+  const swiperRef = useRef(null);
   const [projects, setProjects] = useState([]);
   const [certificates, setCertificates] = useState([]);
   const [showAllProjects, setShowAllProjects] = useState(false);
@@ -149,6 +158,15 @@ export default function FullWidthTabs() {
       once: false,
     });
   }, []);
+
+  const getProjectFallbackImg = (title) => {
+    const t = (title || "").toLowerCase();
+    if (t.includes("eyehealth")) return "/eyehealth_banner.jpg?v=2";
+    if (t.includes("hiitify")) return "/hiitify_banner.jpg?v=2";
+    if (t.includes("chipset")) return "/spk_chipset_banner.jpg?v=2";
+    if (t.includes("bimbel")) return "/smart_bimbel_banner.jpg?v=2";
+    return "";
+  };
 
   const fetchData = useCallback(async () => {
     try {
@@ -163,21 +181,29 @@ export default function FullWidthTabs() {
       if (projectsResponse.error) throw projectsResponse.error;
       if (certificatesResponse.error) throw certificatesResponse.error;
 
-      const projectData = (projectsResponse.data || []).map((item) => ({
-        id: item.id,
-        Title: item.title,
-        Description: item.description,
-        Img: item.img,
-        Link: item.link,
-        Github: item.github,
-        Features: item.features || [],
-        TechStack: item.tech_stack || [],
-      }));
+      const projectData = (projectsResponse.data || []).map((item) => {
+        const title = item.Title || item.title || "";
+        const fallback = getProjectFallbackImg(title);
+        let link = item.Link || item.link;
+        if (!link && title.toLowerCase().includes("bimbel")) {
+          link = "https://binacendikia.web.id";
+        }
+        return {
+          id: item.id,
+          Title: title,
+          Description: item.Description || item.description,
+          Img: (item.Img && item.Img.startsWith("http")) ? item.Img : (fallback || item.Img || item.img),
+          Link: link,
+          Github: item.Github || item.github,
+          Features: item.Features || item.features || [],
+          TechStack: item.TechStack || item.tech_stack || [],
+        };
+      });
 
       // 🔥 FIX DI SINI
       const certificateData = (certificatesResponse.data || []).map((item) => ({
         id: item.id,
-        Img: item.img,
+        Img: item.Img || item.img,
       }));
 
       setProjects(projectData);
@@ -191,13 +217,29 @@ export default function FullWidthTabs() {
   }, []);
 
   useEffect(() => {
-    // Coba ambil dari localStorage dulu untuk laod lebih cepat
+    // Coba ambil dari localStorage dulu untuk load lebih cepat
     const cachedProjects = localStorage.getItem("projects");
     const cachedCertificates = localStorage.getItem("certificates");
 
     if (cachedProjects && cachedCertificates) {
-      setProjects(JSON.parse(cachedProjects));
-      setCertificates(JSON.parse(cachedCertificates));
+      try {
+        const parsed = JSON.parse(cachedProjects).map((item) => {
+          const fallback = getProjectFallbackImg(item.Title);
+          let link = item.Link || item.link;
+          if (!link && (item.Title || "").toLowerCase().includes("bimbel")) {
+            link = "https://binacendikia.web.id";
+          }
+          return {
+            ...item,
+            Link: link,
+            Img: (item.Img && item.Img.startsWith("http")) ? item.Img : (fallback || item.Img),
+          };
+        });
+        setProjects(parsed);
+        setCertificates(JSON.parse(cachedCertificates));
+      } catch (e) {
+        console.error("Error parsing cache:", e);
+      }
     }
 
     fetchData(); // Tetap panggil fetchData untuk sinkronisasi data terbaru
@@ -256,13 +298,13 @@ export default function FullWidthTabs() {
       </div>
 
       <Box sx={{ width: "100%" }}>
-        {/* AppBar and Tabs section - unchanged */}
+        {/* AppBar and Tabs section - Styled with Neon Green and Deep Blue theme */}
         <AppBar
           position="static"
           elevation={0}
           sx={{
             bgcolor: "transparent",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
+            border: "1px solid rgba(255, 255, 255, 0.08)",
             borderRadius: "20px",
             position: "relative",
             overflow: "hidden",
@@ -274,19 +316,18 @@ export default function FullWidthTabs() {
               right: 0,
               bottom: 0,
               background:
-                "linear-gradient(180deg, rgba(139, 92, 246, 0.03) 0%, rgba(59, 130, 246, 0.03) 100%)",
+                "linear-gradient(180deg, rgba(0, 255, 136, 0.03) 0%, rgba(30, 58, 138, 0.05) 100%)",
               backdropFilter: "blur(10px)",
               zIndex: 0,
             },
           }}
           className="md:px-4"
         >
-          {/* Tabs remain unchanged */}
           <Tabs
             value={value}
             onChange={handleChange}
-            textColor="secondary"
-            indicatorColor="secondary"
+            textColor="inherit"
+            indicatorColor="primary"
             variant="fullWidth"
             sx={{
               minHeight: "70px",
@@ -295,26 +336,31 @@ export default function FullWidthTabs() {
                 fontWeight: "600",
                 color: "#94a3b8",
                 textTransform: "none",
-                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                 padding: "20px 0",
                 zIndex: 1,
                 margin: "8px",
-                borderRadius: "12px",
+                borderRadius: "14px",
+                border: "1px solid transparent",
                 "&:hover": {
                   color: "#ffffff",
-                  backgroundColor: "rgba(139, 92, 246, 0.1)",
+                  backgroundColor: "rgba(0, 255, 136, 0.06)",
+                  borderColor: "rgba(0, 255, 136, 0.15)",
                   transform: "translateY(-2px)",
                   "& .lucide": {
+                    color: "#00ff88",
                     transform: "scale(1.1) rotate(5deg)",
                   },
                 },
                 "&.Mui-selected": {
-                  color: "#fff",
+                  color: "#ffffff",
                   background:
-                    "linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2))",
-                  boxShadow: "0 4px 15px -3px rgba(139, 92, 246, 0.2)",
+                    "linear-gradient(135deg, rgba(0, 255, 136, 0.16) 0%, rgba(30, 58, 138, 0.3) 100%)",
+                  borderColor: "rgba(0, 255, 136, 0.35)",
+                  boxShadow: "0 4px 20px -2px rgba(0, 255, 136, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.1)",
                   "& .lucide": {
-                    color: "#a78bfa",
+                    color: "#00ff88",
+                    filter: "drop-shadow(0 0 6px rgba(0, 255, 136, 0.6))",
                   },
                 },
               },
@@ -354,52 +400,85 @@ export default function FullWidthTabs() {
           axis={theme.direction === "rtl" ? "x-reverse" : "x"}
           index={value}
           onChangeIndex={setValue}
+          slideStyle={{ overflowY: "visible" }}
         >
           <TabPanel value={value} index={0} dir={theme.direction}>
-            <div className="container mx-auto flex justify-center items-center overflow-hidden">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-5">
-                {displayedProjects.map((project, index) => (
-                  <div
-                    key={project.id || index}
-                    data-aos={
-                      index % 3 === 0
-                        ? "fade-up-right"
-                        : index % 3 === 1
-                          ? "fade-up"
-                          : "fade-up-left"
-                    }
-                    data-aos-duration={
-                      index % 3 === 0
-                        ? "1000"
-                        : index % 3 === 1
-                          ? "1200"
-                          : "1000"
-                    }
-                  >
-                    <CardProject
-                      Img={project.Img}
-                      Title={project.Title}
-                      Description={project.Description}
-                      Link={project.Link}
-                      id={project.id}
-                    />
-                  </div>
-                ))}
+            <motion.div 
+              key={`projects-panel-${value}`}
+              initial={{ opacity: 0, x: -40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              className="container mx-auto flex flex-col justify-center pb-6"
+            >
+              {/* Slider Wrapper with hover-triggered side navigation arrows in the gutter */}
+              <div className="relative group/slider w-full px-2 sm:px-6 md:px-10">
+                {/* Left Floating Arrow Button - Positioned in the outer gutter */}
+                <button
+                  onClick={() => swiperRef.current?.slidePrev()}
+                  aria-label="Previous Project"
+                  className="absolute left-0 sm:left-1 md:left-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 md:w-12 md:h-12 rounded-full bg-[#0b0f19]/90 backdrop-blur-md border border-white/20 hover:border-[#00ff88] hover:bg-[#00ff88]/20 text-white flex items-center justify-center shadow-[0_4px_25px_rgba(0,0,0,0.8)] opacity-0 group-hover/slider:opacity-100 scale-90 group-hover/slider:scale-100 hover:!scale-110 transition-all duration-300 pointer-events-none group-hover/slider:pointer-events-auto cursor-pointer"
+                >
+                  <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-slate-300 group-hover/slider:text-[#00ff88]" />
+                </button>
+
+                {/* Right Floating Arrow Button - Positioned in the outer gutter */}
+                <button
+                  onClick={() => swiperRef.current?.slideNext()}
+                  aria-label="Next Project"
+                  className="absolute right-0 sm:right-1 md:right-2 top-1/2 -translate-y-1/2 z-30 w-11 h-11 md:w-12 md:h-12 rounded-full bg-[#0b0f19]/90 backdrop-blur-md border border-white/20 hover:border-[#00ff88] hover:bg-[#00ff88]/20 text-white flex items-center justify-center shadow-[0_4px_25px_rgba(0,0,0,0.8)] opacity-0 group-hover/slider:opacity-100 scale-90 group-hover/slider:scale-100 hover:!scale-110 transition-all duration-300 pointer-events-none group-hover/slider:pointer-events-auto cursor-pointer"
+                >
+                  <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-slate-300 group-hover/slider:text-[#00ff88]" />
+                </button>
+
+                <Swiper
+                  onBeforeInit={(swiper) => {
+                    swiperRef.current = swiper;
+                  }}
+                  grabCursor={true}
+                  centeredSlides={false}
+                  slidesPerView={"auto"}
+                  spaceBetween={24}
+                  autoplay={{
+                    delay: 3500,
+                    disableOnInteraction: false,
+                    pauseOnMouseEnter: true,
+                  }}
+                  modules={[Autoplay]}
+                  className="w-full !overflow-y-visible pt-6 pb-8"
+                >
+                  {projects.map((project, index) => (
+                    <SwiperSlide 
+                      key={project.id || index} 
+                      className="!w-[240px] sm:!w-[280px] md:!w-[310px] lg:!w-[330px] transition-transform duration-300 pt-3 pb-3 !overflow-visible"
+                    >
+                      <motion.div
+                        initial={{ opacity: 0, x: -60, scale: 0.95 }}
+                        animate={{ opacity: 1, x: 0, scale: 1 }}
+                        transition={{ 
+                          duration: 0.5, 
+                          delay: 0.08 + (index % 6) * 0.08, 
+                          ease: [0.22, 1, 0.36, 1] 
+                        }}
+                        className="h-full"
+                      >
+                        <CardProject
+                          Img={project.Img}
+                          Title={project.Title}
+                          Description={project.Description}
+                          Link={project.Link}
+                          id={project.id}
+                        />
+                      </motion.div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
               </div>
-            </div>
-            {projects.length > initialItems && (
-              <div className="mt-6 w-full flex justify-start">
-                <ToggleButton
-                  onClick={() => toggleShowMore("projects")}
-                  isShowingMore={showAllProjects}
-                />
-              </div>
-            )}
+            </motion.div>
           </TabPanel>
 
           <TabPanel value={value} index={1} dir={theme.direction}>
             <div className="container mx-auto flex justify-center items-center overflow-hidden">
-              <div className="grid grid-cols-1 md:grid-cols-3 md:gap-5 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:gap-8 gap-5 w-full">
                 {displayedCertificates.map((certificate, index) => (
                   <div
                     key={certificate.id || index}
@@ -424,7 +503,7 @@ export default function FullWidthTabs() {
               </div>
             </div>
             {certificates.length > initialItems && (
-              <div className="mt-6 w-full flex justify-start">
+              <div className="mt-8 w-full flex justify-center items-center">
                 <ToggleButton
                   onClick={() => toggleShowMore("certificates")}
                   isShowingMore={showAllCertificates}

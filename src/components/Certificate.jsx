@@ -1,201 +1,142 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useState } from "react"
+import React, { useState } from "react";
 // eslint-disable-next-line no-unused-vars
-import { Modal, IconButton, Box, Fade, Backdrop, Zoom, Typography } from "@mui/material"
-import CloseIcon from "@mui/icons-material/Close"
-import FullscreenIcon from "@mui/icons-material/Fullscreen"
+import { Modal, IconButton, Box, Backdrop } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import FullscreenIcon from "@mui/icons-material/Fullscreen";
 
 // eslint-disable-next-line react/prop-types
 const Certificate = ({ ImgSertif }) => {
-	const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
-	const handleOpen = () => {
-		setOpen(true)
-	}
+  const handleOpen = () => {
+    setOpen(true);
+  };
 
-	const handleClose = () => {
-		setOpen(false)
-	}
+  const handleClose = () => {
+    setOpen(false);
+  };
 
-	return (
-		<Box component="div" sx={{ width: "100%" }}>
-			{/* Thumbnail Container */}
-			<Box
-				className=""
-				sx={{
-					position: "relative",
-					overflow: "hidden",
-					borderRadius: 2,
-					boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
-					transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-					"&:hover": {
-						transform: "translateY(-5px)",
-						boxShadow: "0 12px 24px rgba(0,0,0,0.2)",
-						"& .overlay": {
-							opacity: 1,
-						},
-						"& .hover-content": {
-							transform: "translate(-50%, -50%)",
-							opacity: 1,
-						},
-						"& .certificate-image": {
-							filter: "contrast(1.05) brightness(1) saturate(1.1)",
-						},
-					},
-				}}>
-				{/* Certificate Image with Initial Filter */}
-				<Box
-					sx={{
-						position: "relative",
-						"&::before": {
-							content: '""',
-							position: "absolute",
-							top: 0,
-							left: 0,
-							right: 0,
-							bottom: 0,
-							backgroundColor: "rgba(0, 0, 0, 0.1)",
-							zIndex: 1,
-						},
-					}}>
-					<img
-						className="certificate-image"
-						src={ImgSertif}
-						alt="Certificate"
-						style={{
-							width: "100%",
-							height: "auto",
-							display: "block",
-							objectFit: "cover",
-							filter: "contrast(1.10) brightness(0.9) saturate(1.1)",
-							transition: "filter 0.3s ease",
-							aspectRatio: "16/11.5",
-						}}
-						onClick={handleOpen}
-					/>
-				</Box>
+  const getCleanTitle = (path) => {
+    if (!path) return "Certificate";
+    const filename = decodeURIComponent(path.split("/").pop().replace(/\.[^/.]+$/, ""));
+    return filename
+      .replace(/^Sertifikat_MUHAMMAD RAFLI ERIYANTO_/i, "")
+      .replace(/^sertifikat\s+/i, "");
+  };
 
-				{/* Hover Overlay */}
-				<Box
-					className="overlay"
-					sx={{
-						position: "absolute",
-						top: 0,
-						left: 0,
-						right: 0,
-						bottom: 0,
-						opacity: 0,
-						transition: "all 0.3s ease",
-						cursor: "pointer",
-						zIndex: 2,
-					}}
-					onClick={handleOpen}>
-					{/* Hover Content */}
-					<Box
-						className="hover-content"
-						sx={{
-							position: "absolute",
-							top: "50%",
-							left: "50%",
-							transform: "translate(-50%, -60%)",
-							opacity: 0,
-							transition: "all 0.4s ease",
-							textAlign: "center",
-							width: "100%",
-							color: "white",
-						}}>
-						<FullscreenIcon
-							sx={{
-								fontSize: 40,
-								mb: 1,
-								filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
-							}}
-						/>
-						<Typography
-							variant="h6"
-							sx={{
-								fontWeight: 600,
-								textShadow: "0 2px 4px rgba(0,0,0,0.3)",
-							}}>
-							View Certificate
-						</Typography>
-					</Box>
-				</Box>
-			</Box>
+  const title = getCleanTitle(ImgSertif);
 
-			{/* Modal */}
-			<Modal
-				open={open}
-				onClose={handleClose}
-				aria-labelledby="modal-modal-title"
-				aria-describedby="modal-modal-description"
-				BackdropComponent={Backdrop}
-				BackdropProps={{
-					timeout: 300,
-					sx: {
-						backgroundColor: "rgba(0, 0, 0, 0.9)",
-						backdropFilter: "blur(5px)",
-					},
-				}}
-				sx={{
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "center",
-					margin: 0,
-					padding: 0,
-					"& .MuiBackdrop-root": {
-						backgroundColor: "rgba(0, 0, 0, 0.9)",
-					},
-				}}>
-				<Box
-					sx={{
-						position: "relative",
-						width: "auto",
-						maxWidth: "90vw",
-						maxHeight: "90vh",
-						m: 0,
-						p: 0,
-						outline: "none",
-						"&:focus": {
-							outline: "none",
-						},
-					}}>
-					{/* Close Button */}
-					<IconButton
-						onClick={handleClose}
-						sx={{
-							position: "absolute",
-							right: 16,
-							top: 16,
-							color: "white",
-							bgcolor: "rgba(0,0,0,0.6)",
-							zIndex: 1,
-							padding: 1,
-							"&:hover": {
-								bgcolor: "rgba(0,0,0,0.8)",
-								transform: "scale(1.1)",
-							},
-						}}
-						size="large">
-						<CloseIcon sx={{ fontSize: 24 }} />
-					</IconButton>
+  return (
+    <div className="w-full">
+      {/* Card Container identical to TechStack style & animation */}
+      <div
+        onClick={handleOpen}
+        className="group relative p-2.5 sm:p-3 rounded-2xl bg-slate-800/50 hover:bg-slate-700/50 border border-white/10 hover:border-primary/40 transition-all duration-300 ease-in-out flex flex-col items-center justify-center hover:scale-105 cursor-pointer shadow-lg hover:shadow-2xl hover:shadow-primary/10 overflow-hidden w-full"
+      >
+        {/* Glow ambient gradient behind card on hover (identical to TechStack) */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary/60 to-accent/50 rounded-2xl opacity-0 group-hover:opacity-40 blur transition duration-300 pointer-events-none" />
 
-					{/* Modal Image */}
-					<img
-						src={ImgSertif}
-						alt="Certificate Full View"
-						style={{
-							display: "block",
-							maxWidth: "100%",
-							maxHeight: "90vh",
-							margin: "0 auto",
-							objectFit: "contain",
-						}}
-					/>
-				</Box>
-			</Modal>
-		</Box>
-	)
-}
+        {/* Thumbnail Image Wrapper */}
+        <div className="relative w-full aspect-[16/11.5] rounded-xl overflow-hidden bg-slate-900/60 z-10">
+          <img
+            className="w-full h-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:contrast-[1.05]"
+            src={ImgSertif}
+            alt={title}
+            loading="lazy"
+          />
 
-export default Certificate
+          {/* Hover Overlay with View Certificate prompt */}
+          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-1.5 backdrop-blur-[2px]">
+            <div className="p-2.5 rounded-full bg-primary/20 border border-primary/50 text-primary transform -translate-y-2 group-hover:translate-y-0 transition-transform duration-300 shadow-[0_0_15px_rgba(0,255,136,0.4)]">
+              <FullscreenIcon sx={{ fontSize: 26 }} />
+            </div>
+            <span className="text-[11px] sm:text-xs font-semibold text-white tracking-wider uppercase">
+              View Certificate
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Fullscreen Preview Modal */}
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="certificate-modal-title"
+        aria-describedby="certificate-modal-description"
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 300,
+          sx: {
+            backgroundColor: "rgba(0, 0, 0, 0.9)",
+            backdropFilter: "blur(8px)",
+          },
+        }}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          margin: 0,
+          padding: 2,
+        }}
+      >
+        <Box
+          sx={{
+            position: "relative",
+            width: "auto",
+            maxWidth: "92vw",
+            maxHeight: "92vh",
+            m: 0,
+            p: 0,
+            outline: "none",
+            borderRadius: 3,
+            overflow: "hidden",
+            boxShadow: "0 0 50px rgba(0, 255, 136, 0.2)",
+            border: "1px solid rgba(0, 255, 136, 0.25)",
+            bgcolor: "#0b0f19",
+          }}
+        >
+          {/* Close Button */}
+          <IconButton
+            onClick={handleClose}
+            sx={{
+              position: "absolute",
+              right: 12,
+              top: 12,
+              color: "white",
+              bgcolor: "rgba(0,0,0,0.7)",
+              zIndex: 10,
+              padding: 1,
+              border: "1px solid rgba(255,255,255,0.2)",
+              "&:hover": {
+                bgcolor: "#00ff88",
+                color: "#000",
+                transform: "scale(1.1)",
+              },
+              transition: "all 0.2s ease",
+            }}
+            size="large"
+          >
+            <CloseIcon sx={{ fontSize: 22 }} />
+          </IconButton>
+
+          {/* Modal Image */}
+          <img
+            src={ImgSertif}
+            alt={title}
+            style={{
+              display: "block",
+              maxWidth: "100%",
+              maxHeight: "90vh",
+              margin: "0 auto",
+              objectFit: "contain",
+            }}
+          />
+        </Box>
+      </Modal>
+    </div>
+  );
+};
+
+export default Certificate;
+

@@ -293,45 +293,52 @@ const Komentar = () => {
 
         // Set up real-time subscription
         const subscription = supabase
-            .channel('portfolio_comments')
+            .channel('portfolio_comments_channel')
             .on('postgres_changes', 
                 { 
                     event: '*', 
                     schema: 'public', 
-                    table: 'portfolio_comments',
-                    filter: 'is_pinned=eq.false'
+                    table: 'portfolio_comments'
                 }, 
                 () => {
-                    fetchComments(); // Refresh comments when changes occur
+                    fetchComments(); // Refresh comments when any change occurs
                 }
             )
             .subscribe();
 
         return () => {
-            subscription.unsubscribe();
+            supabase.removeChannel(subscription);
         };
     }, []);
 
     const uploadImage = useCallback(async (imageFile) => {
         if (!imageFile) return null;
         
-        const fileExt = imageFile.name.split('.').pop();
-        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
-        const filePath = `profile-images/${fileName}`;
+        try {
+            const fileExt = imageFile.name.split('.').pop();
+            const fileName = `avatar_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
 
-        const { error: uploadError } = await supabase.storage
-            .from('profile-images')
-            .upload(filePath, imageFile);
+            const { error: uploadError } = await supabase.storage
+                .from('profile-images')
+                .upload(fileName, imageFile, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
 
-        if (uploadError) {
-            throw uploadError;
+            if (uploadError) {
+                console.warn('Storage upload warning:', uploadError.message);
+                return null;
+            }
+
+            const { data } = supabase.storage
+                .from('profile-images')
+                .getPublicUrl(fileName);
+
+            return data?.publicUrl || null;
+        } catch (err) {
+            console.warn('Image upload skipped:', err);
+            return null;
         }
-
-        const { data } = supabase.storage
-            .from('profile-images')
-            .getPublicUrl(filePath);
-
-        return data.publicUrl;
     }, []);
 
     const handleCommentSubmit = useCallback(async ({ newComment, userName, imageFile }) => {
@@ -345,8 +352,8 @@ const Komentar = () => {
                 .from('portfolio_comments')
                 .insert([
                     {
-                        content: newComment,
-                        user_name: userName,
+                        content: newComment.trim(),
+                        user_name: userName.trim(),
                         profile_image: profileImageUrl,
                         is_pinned: false,
                         created_at: new Date().toISOString()
@@ -356,8 +363,16 @@ const Komentar = () => {
             if (error) {
                 throw error;
             }
+
+            // Immediately refresh list locally
+            const { data } = await supabase
+                .from('portfolio_comments')
+                .select('*')
+                .eq('is_pinned', false)
+                .order('created_at', { ascending: false });
+            if (data) setComments(data);
         } catch (error) {
-            setError('Failed to post comment. Please try again.');
+            setError('Gagal mengirim komentar. Silakan coba lagi.');
             console.error('Error adding comment: ', error);
         } finally {
             setIsSubmitting(false);
