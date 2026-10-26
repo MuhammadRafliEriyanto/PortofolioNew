@@ -99,12 +99,12 @@ const SOCIAL_LINKS = [
   },
   {
     icon: Linkedin,
-    link: "https://www.linkedin.com/in/mhmmd-rafli-107530236/",
+    link: "https://www.linkedin.com/in/muhammad-rafli-107530236/",
     label: "LinkedIn Profile",
   },
   {
     icon: Instagram,
-    link: "https://www.instagram.com/_dolph1nsss",
+    link: "https://www.instagram.com/_dolph1nss",
     label: "Instagram Profile",
   },
 ];
@@ -191,8 +191,8 @@ const Home = () => {
     "url": "https://your-domain.com",
     "sameAs": [
       "https://github.com/MuhammadRafliEriyanto",
-      "https://www.linkedin.com/in/mhmmd-rafli-107530236/",
-      "https://www.instagram.com/_dolph1nsss"
+      "https://www.linkedin.com/in/muhammad-rafli-107530236/",
+      "https://www.instagram.com/_dolph1nss"
     ]
   }
 `}</script>

@@ -17,7 +17,7 @@ import TechStackIcon from "../components/TechStackIcon";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Certificate from "../components/Certificate";
-import { Code, Award, Boxes, ChevronLeft, ChevronRight } from "lucide-react";
+import { Code, Award, Boxes, ChevronLeft, ChevronRight, Briefcase, Calendar, Building2, MapPin } from "lucide-react";
 import { motion } from "framer-motion";
 
 // Swiper
@@ -381,17 +381,24 @@ export default function FullWidthTabs() {
             />
             <Tab
               icon={
+                <Briefcase className="mb-2 w-5 h-5 transition-all duration-300" />
+              }
+              label="Experience"
+              {...a11yProps(1)}
+            />
+            <Tab
+              icon={
                 <Award className="mb-2 w-5 h-5 transition-all duration-300" />
               }
               label="Certificates"
-              {...a11yProps(1)}
+              {...a11yProps(2)}
             />
             <Tab
               icon={
                 <Boxes className="mb-2 w-5 h-5 transition-all duration-300" />
               }
               label="Tech Stack"
-              {...a11yProps(2)}
+              {...a11yProps(3)}
             />
           </Tabs>
         </AppBar>
@@ -476,7 +483,153 @@ export default function FullWidthTabs() {
             </motion.div>
           </TabPanel>
 
+          {/* Tab 1: Experience */}
           <TabPanel value={value} index={1} dir={theme.direction}>
+            <motion.div
+              key={`experience-panel-${value}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="container mx-auto max-w-4xl px-2 sm:px-6 py-4 pb-8"
+            >
+              <div className="relative">
+                {/* Glowing Spine Timeline Line */}
+                <div className="absolute left-4 sm:left-8 top-8 bottom-8 w-0.5 bg-gradient-to-b from-blue-500 via-primary to-accent hidden sm:block opacity-60" />
+
+                <div className="space-y-8">
+                  {/* Experience 1: Waiters & Kasir (2024 - 2025) */}
+                  <div className="relative flex flex-col sm:flex-row items-start gap-4 sm:gap-8 group">
+                    {/* Node on Timeline */}
+                    <div className="hidden sm:flex w-16 h-16 rounded-2xl bg-[#0b0f19] border border-white/10 group-hover:border-blue-500/50 items-center justify-center relative z-10 transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.6)] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.25)] flex-shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform duration-300">
+                        <Briefcase className="w-5 h-5" />
+                      </div>
+                    </div>
+
+                    {/* Card */}
+                    <div className="w-full bg-black/30 backdrop-blur-lg rounded-2xl p-6 sm:p-7 border border-white/10 group-hover:border-blue-500/40 transition-all duration-300 hover:shadow-[0_0_35px_rgba(59,130,246,0.15)] relative overflow-hidden">
+                      <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/5 via-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                      <div className="relative z-10">
+                        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                          <span className="text-xs px-3 py-1 rounded-full font-medium border bg-blue-500/10 text-blue-400 border-blue-500/20">
+                            Work Experience
+                          </span>
+                          <span className="text-xs sm:text-sm text-slate-400 flex items-center gap-1.5 font-medium">
+                            <Calendar className="w-3.5 h-3.5 text-blue-400" />
+                            September 2024 – Juni 2025
+                          </span>
+                        </div>
+
+                        <div className="mb-3">
+                          <h4 className="text-lg sm:text-xl font-bold text-white group-hover:text-blue-400 transition-colors">
+                            Waiters & Kasir
+                          </h4>
+                          <div className="flex items-center gap-1.5 text-slate-300 text-sm mt-1">
+                            <Building2 className="w-4 h-4 text-blue-400/80" />
+                            <span className="font-medium text-slate-200">Njajajan Co</span>
+                            <span className="text-slate-500">•</span>
+                            <span className="text-slate-400 flex items-center gap-1 text-xs">
+                              <MapPin className="w-3 h-3 text-slate-500" />
+                              Tegal
+                            </span>
+                          </div>
+                        </div>
+
+                        <ul className="space-y-2 mb-5 text-slate-300/80 text-xs sm:text-sm leading-relaxed">
+                          <li className="flex items-start gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 flex-shrink-0" />
+                            <span>Melayani 30–75 transaksi per shift (tunai & non-tunai) menggunakan sistem kasir secara akurat.</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 flex-shrink-0" />
+                            <span>Menjaga standar kualitas penyajian, kebersihan area operasional, serta pencatatan stok bahan.</span>
+                          </li>
+                        </ul>
+
+                        <div className="flex flex-wrap gap-1.5 pt-3 border-t border-white/5">
+                          {["Customer Service", "POS Cashier", "Cash Handling", "Inventory Control"].map((skill) => (
+                            <span
+                              key={skill}
+                              className="text-[0.7rem] sm:text-xs px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5 transition-colors"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Experience 2: Backend Developer Intern (2025) */}
+                  <div className="relative flex flex-col sm:flex-row items-start gap-4 sm:gap-8 group">
+                    {/* Node on Timeline */}
+                    <div className="hidden sm:flex w-16 h-16 rounded-2xl bg-[#0b0f19] border border-white/10 group-hover:border-primary/50 items-center justify-center relative z-10 transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.6)] group-hover:shadow-[0_0_25px_rgba(0,255,136,0.25)] flex-shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300">
+                        <Code className="w-5 h-5" />
+                      </div>
+                    </div>
+
+                    {/* Card */}
+                    <div className="w-full bg-black/30 backdrop-blur-lg rounded-2xl p-6 sm:p-7 border border-white/10 group-hover:border-primary/40 transition-all duration-300 hover:shadow-[0_0_35px_rgba(0,255,136,0.15)] relative overflow-hidden">
+                      <div className="absolute -inset-1 bg-gradient-to-r from-primary/5 via-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+                      <div className="relative z-10">
+                        <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                          <span className="text-xs px-3 py-1 rounded-full font-medium border bg-primary/10 text-primary border-primary/20">
+                            Internship
+                          </span>
+                          <span className="text-xs sm:text-sm text-slate-400 flex items-center gap-1.5 font-medium">
+                            <Calendar className="w-3.5 h-3.5 text-primary" />
+                            Juni – November 2025
+                          </span>
+                        </div>
+
+                        <div className="mb-3">
+                          <h4 className="text-lg sm:text-xl font-bold text-white group-hover:text-primary transition-colors">
+                            Backend Developer Intern
+                          </h4>
+                          <div className="flex items-center gap-1.5 text-slate-300 text-sm mt-1">
+                            <Building2 className="w-4 h-4 text-accent" />
+                            <span className="font-medium text-slate-200">PT GIT Solution</span>
+                            <span className="text-slate-500">•</span>
+                            <span className="text-slate-400 flex items-center gap-1 text-xs">
+                              <MapPin className="w-3 h-3 text-slate-500" />
+                              Yogyakarta
+                            </span>
+                          </div>
+                        </div>
+
+                        <ul className="space-y-2 mb-5 text-slate-300/80 text-xs sm:text-sm leading-relaxed">
+                          <li className="flex items-start gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                            <span>Mengembangkan REST API, mengelola database (CRUD), dan integrasi backend-frontend.</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                            <span>Berkolaborasi aktif dengan tim developer dalam pengembangan dan penyelesaian fitur aplikasi.</span>
+                          </li>
+                        </ul>
+
+                        <div className="flex flex-wrap gap-1.5 pt-3 border-t border-white/5">
+                          {["REST API", "Database CRUD", "Backend Integration", "Team Collaboration"].map((skill) => (
+                            <span
+                              key={skill}
+                              className="text-[0.7rem] sm:text-xs px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/5 transition-colors"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </TabPanel>
+
+          <TabPanel value={value} index={2} dir={theme.direction}>
             <div className="container mx-auto flex justify-center items-center overflow-hidden">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:gap-8 gap-5 w-full">
                 {displayedCertificates.map((certificate, index) => (
@@ -512,7 +665,7 @@ export default function FullWidthTabs() {
             )}
           </TabPanel>
 
-          <TabPanel value={value} index={2} dir={theme.direction}>
+          <TabPanel value={value} index={3} dir={theme.direction}>
             <div className="container mx-auto flex justify-center items-center overflow-hidden pb-[5%]">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 lg:gap-8 gap-5">
                 {techStacks.map((stack, index) => (
