@@ -21,10 +21,10 @@ const StatusBadge = memo(() => (
     <div className="relative group">
       <div className="absolute -inset-0.5 bg-gradient-to-r from-[#00ff88] to-[#1e3a8a] rounded-full blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
       <div className="relative px-3 sm:px-4 py-2 rounded-full bg-black/40 backdrop-blur-xl border border-white/10">
-        <span className="bg-gradient-to-r from-[#00ff88] to-[#1e3a8a] text-transparent bg-clip-text sm:text-sm text-[0.7rem] font-medium flex items-center">
+        {/* <span className="bg-gradient-to-r from-[#00ff88] to-[#1e3a8a] text-transparent bg-clip-text sm:text-sm text-[0.7rem] font-medium flex items-center">
           <Sparkles className="sm:w-4 sm:h-4 w-3 h-3 mr-2 text-primary" />
-          Ready to Innovate
-        </span>
+          
+        </span> */}
       </div>
     </div>
   </div>
@@ -89,7 +89,7 @@ const SocialLink = memo(({ icon: Icon, link, label }) => (
 const TYPING_SPEED = 100;
 const ERASING_SPEED = 50;
 const PAUSE_DURATION = 2000;
-const WORDS = ["Informatics Student", "API & System Builder"];
+const WORDS = ["Fresh Graduate", "API & System Builder"];
 const TECH_STACK = ["Javascript", "Python", "PHP", "Node.js"];
 const SOCIAL_LINKS = [
   {

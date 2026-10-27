@@ -50,7 +50,7 @@ const socialLinks = [
   {
     name: "TikTok",
     displayName: "Tiktok",
-    subText: "@3131user04",
+    subText: "@1010username11",
     icon: ({ className }) => (
       <svg
         className={className}
@@ -89,7 +89,7 @@ const socialLinks = [
         </g>
       </svg>
     ),
-    url: "https://www.tiktok.com/@3131user04",
+    url: "https://www.tiktok.com/@1010username11",
     color: "#00ff88",
     gradient: "from-[#00ff88] via-[#22c55e] to-[#1e3a8a]",
   },

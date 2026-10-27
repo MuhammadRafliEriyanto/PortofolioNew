@@ -60,9 +60,9 @@ const ProfileImage = memo(() => (
           <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-accent/20 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 hidden sm:block" />
 
           <img
-            src="/profil1.jpeg"
+            src="/profil.jpg"
             alt="Profile"
-            className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-2"
+            className="w-full h-full object-cover object-[center_20%] transition-all duration-700 group-hover:scale-110 group-hover:rotate-2"
             loading="lazy"
           />
 
@@ -236,11 +236,10 @@ const AboutPage = () => {
               data-aos="fade-right"
               data-aos-duration="1500"
             >
-              Saya adalah mahasiswa Teknik Informatika yang sedang mendalami
+              Saya adalah fresh graduate Teknik Informatika yang berfokus pada
               pengembangan web secara menyeluruh, mulai dari frontend hingga
-              backend. Sebagai pemula, saya berfokus untuk memahami cara
-              membangun aplikasi yang fungsional, terstruktur, dan terus
-              berkembang.
+              backend. Saya berkomitmen untuk terus membangun aplikasi yang
+              fungsional, terstruktur, dan siap berkembang di dunia industri.
             </p>
 
             {/* Quote Section */}
@@ -272,8 +271,10 @@ const AboutPage = () => {
 
             <div className="flex flex-col lg:flex-row items-center lg:items-start gap-4 lg:gap-4 lg:px-0 w-full">
               <a
-                href="/CV/CV - RAFLI.pdf"
-                download="CV - RAFLI.pdf"
+                href="/Resume/Resume - Muhammad Rafli Eriyanto.pdf"
+                download="Resume - Muhammad Rafli Eriyanto.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full lg:w-auto"
               >
                 <button
@@ -281,7 +282,7 @@ const AboutPage = () => {
                   data-aos-duration="800"
                   className="w-full lg:w-auto sm:px-6 py-2 sm:py-3 rounded-lg bg-gradient-to-r from-primary to-accent text-white font-medium transition-all duration-300 hover:scale-105 flex items-center justify-center lg:justify-start gap-2 shadow-lg hover:shadow-xl "
                 >
-                  <FileText className="w-4 h-4 sm:w-5 sm:h-5" /> Download CV
+                  <FileText className="w-4 h-4 sm:w-5 sm:h-5" /> Download Resume
                 </button>
               </a>
               <a href="#Portofolio" className="w-full lg:w-auto">
